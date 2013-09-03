@@ -1,0 +1,7 @@
+*.~*~
+packages
+# custom <additional>
+pubspec.lock
+test_chattel.dart
+# end <additional>
+

@@ -1,0 +1,35 @@
+name: simple_schema
+version: 0.0.1
+author: Daniel Davidson <dbdavidson@yahoo.com>
+homepage: https://github.com/patefacio/simple_schema
+description: >
+  Provide declarative api for creating json schema
+dependencies:
+  id: "any"
+
+  json_schema: "any"
+
+  logging: ">=0.6.21+3 <0.6.22"
+
+  logging_handlers: ">=0.5.0+3 <0.5.1"
+
+# custom <simple_schema dependencies>
+
+  id:
+    path: /Users/dbdavidson/dev/open_source/id/
+
+  json_schema:
+    path: /Users/dbdavidson/dev/open_source/json_schema/
+
+  plus:
+    path: /Users/dbdavidson/dev/plusauri/dart/plus/
+
+# end <simple_schema dependencies>
+
+dev_dependencies:
+  hop: "0.24.2"
+
+# custom <simple_schema dev dependencies>
+# end <simple_schema dev dependencies>
+
+
