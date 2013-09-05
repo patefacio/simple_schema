@@ -5,6 +5,7 @@ import 'package:json_schema/json_schema.dart';
 import 'dart:convert' as convert;
 import 'package:unittest/unittest.dart';
 // custom <additional imports>
+import 'package:json_schema/schema_dot.dart';
 // end <additional imports>
 
 

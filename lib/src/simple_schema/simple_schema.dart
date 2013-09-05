@@ -9,13 +9,13 @@ class JMap {
   ) {
 
   }
-  
+
   /// Id of referred to schema for values in map
   Id refId;
 
   // custom <class JMap>
-  String get label => 'map(${refId.camel})';
-  String get definition => '#/definitions/$label';
+  String get name => 'map(${refId.camel})';
+  String get definition => '#/definitions/$name';
   // end <class JMap>
 }
 
@@ -28,13 +28,13 @@ class JList {
   ) {
 
   }
-  
+
   /// Id of referred to schema for items in list
   Id refId;
 
   // custom <class JList>
-  String get label => 'list(${refId.camel})';
-  String get definition => '#/definitions/$label';
+  String get name => 'list(${refId.camel})';
+  String get definition => '#/definitions/$name';
   // end <class JList>
 }
 
@@ -45,18 +45,24 @@ class Property {
   ) {
 
   }
-  
+
   /// Id for property used to generate the name
   Id id;
   /// Initial value, as perk type will be gleaned if provided
   dynamic init;
-  bool isRequired = true;
+  SimpleSchema _schema;
+  SimpleSchema get schema => _schema;
+  bool isRequired;
   /// What type should be stored in the property
   dynamic type;
-  /// Define property type by id
-  String ref;
 
   // custom <class Property>
+
+  void _finalize(SimpleSchema schema) {
+    _schema = schema;
+  }
+
+  String get name => id.camel;
 
   // end <class Property>
 }
@@ -72,12 +78,13 @@ class SimpleSchema {
   ) {
 
   }
-  
+
   /// Id for property used to generate the name
   Id id;
   /// List of properties for this schema
   List<Property> properties = [];
   Package _package;
+  Package get package => _package;
 
   // custom <class SimpleSchema>
 
@@ -85,64 +92,90 @@ class SimpleSchema {
 
   get jLists => properties.where((prop) => prop is JList);
 
+  get name => id.camel;
+
+  void _finalize(Package pkg) {
+    _package = pkg;
+    _package._addDefinition(name, {});
+    jMaps.forEach((jMap) => _package._addJmap(jMap));
+    jLists.forEach((jList) => _package._addJList(jList));
+    properties.forEach((prop) => prop._finalize(this));
+  }
+
+  String inferTypeFromInit(dynamic init) {
+    var type;
+    if(init is List) {
+      type = "array";
+    } else if(init is bool) {
+      type = "boolean";
+    } else if(init is int) {
+      type = "integer";
+    } else if(init is num) {
+      type = "number";
+    } else if(init is Map) {
+      type = "object";
+    } else if(init is String) {
+      type = "string";
+    } else {
+      type = "unknown";
+    }
+    return type;
+  }
+  
   Map get _definition {
     var props = {};
+
     properties.forEach((prop) {
-      var id = prop.id.camel;
-      if(prop.ref != null) {
-        props[id] = { r'$ref' : '#/definitions/$id' };
-      } else if(prop.type != null) {
-        var type = prop.type;
-        if(type is JMap) {
-          _package._addJMap(type);
-          props[id] = { r'$ref' : "${type.definition}" };
-        } else if(type is JList) {
-          _package._addJList(type);
-          props[id] = { r'$ref' : "${type.definition}" };
-        } else {
-          if(_package._hasType(type)) {
-            props[id] = {
-              r'$ref' : '#/definitions/${type}'
-            };
-          } else {
-            var schemaType = SchemaType.fromString(type);
-            if(schemaType == null) {
-              print("GOOG $type");
-            }
-            props[id] = { "type": schemaType };
-          }
-        }
-      } else {
-        if(_package._hasType(id)) {
-          props[id] = { r'$ref' : '#/definitions/$id' };
-        } else if(prop.init != null) {
-          var init = prop.init;
-          var type;
-          if(init is List) {
-            type = "array";
-          } else if(init is bool) {
-            type = "boolean";
-          } else if(init is int) {
-            type = "integer";
-          } else if(init is num) {
-            type = "number";
-          } else if(init is Map) {
-            type = "object";
-          } else if(init is String) {
-            type = "string";
-          } else {
-            type = "unknown";
-          }
-          props[id] = {
-            "type" : type,
-            "defaultValue": init,
+      if(prop.init != null) {
+          props[name] = {
+            "type" : inferTypeFromInit(prop.init),
+            "defaultValue": prop.init,
           };
+      } else {
+        var name = prop.name;
+        if(prop.type != null) {
+          var type = prop.type;
+          if(type is JMap) {
+            _package._addJMap(type);
+            props[name] = ref(type.name);
+          } else if(type is JList) {
+            _package._addJList(type);
+            props[name] = ref(type.name);
+          } else {
+            var asKey = idFromString(type).camel;
+            if(_package._hasType(asKey)) {
+              props[name] = ref(asKey);
+            } else {
+              var schemaType = SchemaType.fromString(type);
+              if(schemaType == null) {
+                throw 
+                  new FormatException("No schema type for $type in prop $prop ");
+              }
+              props[name] = { "type": schemaType };
+            }
+          }
         } else {
-          props[id] = { "type":"string" };
+          props[name] = _package._hasType(name)? 
+            props[name] = ref(name) : { "type":"string" };
         }
       }
     });
-    return {'properties' : props};
+
+
+    var schemaMap = {'properties' : props};
+
+    var requiredProps = properties
+    .where((prop) => 
+        prop.isRequired == null? 
+        _package.defaultRequired : prop.isRequired)
+    .map((prop) => prop.name)
+    .toList();
+
+    if(requiredProps.length > 0) {
+      schemaMap['required'] = requiredProps;
+    }
+
+    return schemaMap;
   }
 
 
@@ -157,9 +190,11 @@ class Package {
   ) {
 
   }
-  
+
   /// Id for property used to generate the name
   Id id;
+  /// Set up all schema in package to be required by default
+  bool defaultRequired = true;
   /// List of types (analagous to #/definitions/...
   List<SimpleSchema> types = [];
   Map<String,SimpleSchema> _typeMap = {};
@@ -173,26 +208,21 @@ class Package {
 
   void _addDefinition(String key, dynamic definition) {
     var definitions = _schemaMap['definitions'];
-    if(definitions.containsKey(key)) {
-      throw new FormatException("Error $key already defined");
+    if(!definitions.containsKey(key)) {
+      definitions[key]=definition;
     }
-    definitions[key]=definition;
   }
 
   void _addJMap(JMap m) => 
-    _addDefinition(m.label, {
+    _addDefinition(m.name, {
       "type" : "object",
-      "additionalProperties" : { 
-        r'$ref' : '#/definitions/${m.refId.camel}' 
-      }
+      "additionalProperties" : ref(m.refId.camel)
     });
 
   void _addJList(JList l) =>
-    _addDefinition(l.label, {
+    _addDefinition(l.name, {
       "type" : "array",
-      "items" : { 
-        r'$ref' : '#/definitions/${l.refId.camel}' 
-      }
+      "items" : ref(l.refId.camel)
     });
 
   bool _hasType(String type) => _schemaMap['definitions'].containsKey(type);
@@ -202,21 +232,16 @@ class Package {
     _schemaMap = { 'definitions' : {} };
 
     types.forEach((schema) {
-      _addDefinition(schema.id.camel, {});
-      schema.jMaps.forEach((jMap) => _addJmap(jMap));
-      schema.jLists.forEach((jList) => _addJList(jList));
+      schema._finalize(this);
     });
 
     types.forEach((schema) {
-      schema._package = this;
-      var id = schema.id.camel;
-      _schema(id).addAll(schema._definition);
+      _schema(schema.name).addAll(schema._definition);
     });
   }
 
   Future<Schema> get schema {
     if(_schemaMap == null) _finalize();
-    print(jp(_schemaMap));
     return Schema.createSchema(_schemaMap);
   }
 
@@ -230,6 +255,7 @@ Property property(String id) => new Property(idFromString(id));
 var prop = property;
 JMap jMap(String id) => new JMap(idFromString(id));
 JList jList(String id) => new JList(idFromString(id));
+ref(String name) => { r'$ref' : '#/definitions/$name' };
 
 // end <part simple_schema>
 

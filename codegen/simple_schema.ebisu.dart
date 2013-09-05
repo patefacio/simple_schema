@@ -22,6 +22,7 @@ void main() {
     ..pubSpec.version = '0.0.1'
     ..pubSpec.addDependency(new PubDependency('id'))
     ..pubSpec.addDependency(new PubDependency('json_schema'))
+    ..pubSpec.addDependency(new PubDependency('ebisu'))
     ..pubSpec.doc = 'Provide declarative api for creating json schema'
     ..rootPath = '$_topDir'
     ..doc = 'The idea is provide simple api to provided guided creation of consistent json schema'
@@ -34,6 +35,12 @@ void main() {
       ]
     ]
     ..libraries = [
+      library('simple_schema_ebisu')
+      ..includeLogger = true
+      ..imports = [
+        'package:ebisu/ebisu.dart',
+        'package:ebisu/ebisu_dart_meta.dart',
+      ],
       library('simple_schema')
       ..includeLogger = true
       ..variables = [
@@ -85,14 +92,14 @@ entry that has a reference schema referred to by refId.
             member('init')
             ..type = 'dynamic'
             ..doc = 'Initial value, as perk type will be gleaned if provided',
+            member('schema')
+            ..access = RO
+            ..type = 'SimpleSchema',
             member('is_required')
-            ..type = 'bool'
-            ..classInit = 'true',
+            ..type = 'bool',
             member('type')
             ..doc = 'What type should be stored in the property'
             ..type = 'dynamic',
-            member('ref')
-            ..doc = 'Define property type by id'
           ],
           class_('simple_schema')
           ..doc = '''
@@ -110,7 +117,7 @@ members of this class for easy declarative construction.
             ..type = 'List<Property>'
             ..classInit = '[]',
             member('package')
-            ..access = IA
+            ..access = RO
             ..type = 'Package',
           ],
           class_('package')
@@ -122,6 +129,10 @@ A collection of packages
             ..doc = 'Id for property used to generate the name'
             ..type = 'Id'
             ..ctors = [''],
+            member('default_required')
+            ..doc = 'Set up all schema in package to be required by default'
+            ..type = 'bool'
+            ..classInit = 'true',
             member('types')
             ..doc = 'List of types (analagous to #/definitions/...'
             ..type = 'List<SimpleSchema>'
