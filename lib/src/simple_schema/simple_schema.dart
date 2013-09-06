@@ -1,41 +1,29 @@
 part of simple_schema;
 
-/// Represents new shcema type (i.e. a schema itself) where type is object
-/// and value schema is referenced by id
-///
-class JMap {
-  JMap(
-    this.refId
+class Enum {
+  Enum(
+    this.id,
+    [
+      this.values
+    ]
   ) {
 
   }
 
-  /// Id of referred to schema for values in map
-  Id refId;
+  Id id;
+  List<String> values = [];
+  List<Id> _valueIds;
+  List<Id> get valueIds => _valueIds;
 
-  // custom <class JMap>
-  String get name => 'map(${refId.camel})';
-  String get definition => '#/definitions/$name';
-  // end <class JMap>
-}
+  // custom <class Enum>
+  
+  String get name => id.camel;
 
-/// Represents new shcema type (i.e. a schema itself) with an items
-/// entry that has a reference schema referred to by refId.
-///
-class JList {
-  JList(
-    this.refId
-  ) {
-
+  void _finalize() {
+    _valueIds = values.map((i) => new Id(i)).toList();
   }
 
-  /// Id of referred to schema for items in list
-  Id refId;
-
-  // custom <class JList>
-  String get name => 'list(${refId.camel})';
-  String get definition => '#/definitions/$name';
-  // end <class JList>
+  // end <class Enum>
 }
 
 /// Property entry in a schema
@@ -54,7 +42,7 @@ class Property {
   SimpleSchema get schema => _schema;
   bool isRequired;
   /// What type should be stored in the property
-  dynamic type;
+  String type;
 
   // custom <class Property>
 
@@ -88,17 +76,10 @@ class SimpleSchema {
 
   // custom <class SimpleSchema>
 
-  get jMaps => properties.where((prop) => prop is JMap);
-
-  get jLists => properties.where((prop) => prop is JList);
-
   get name => id.camel;
 
   void _finalize(Package pkg) {
     _package = pkg;
-    _package._addDefinition(name, {});
-    jMaps.forEach((jMap) => _package._addJmap(jMap));
-    jLists.forEach((jList) => _package._addJList(jList));
     properties.forEach((prop) => prop._finalize(this));
   }
 
@@ -126,37 +107,29 @@ class SimpleSchema {
     var props = {};
 
     properties.forEach((prop) {
+      var name = prop.name;
       if(prop.init != null) {
-          props[name] = {
-            "type" : inferTypeFromInit(prop.init),
-            "defaultValue": prop.init,
-          };
+        prop.type = inferTypeFromInit(prop.init);
+        props[name] = {
+          "type" : prop.type,
+          "defaultValue": prop.init,
+        };
       } else {
-        var name = prop.name;
         if(prop.type != null) {
-          var type = prop.type;
-          if(type is JMap) {
-            _package._addJMap(type);
-            props[name] = ref(type.name);
-          } else if(type is JList) {
-            _package._addJList(type);
-            props[name] = ref(type.name);
+          var schemaType = SchemaType.fromString(prop.type);
+          if(schemaType != null) {
+            props[name] = { "type": schemaType };
           } else {
-            var asKey = idFromString(type).camel;
-            if(_package._hasType(asKey)) {
-              props[name] = ref(asKey);
-            } else {
-              var schemaType = SchemaType.fromString(type);
-              if(schemaType == null) {
-                throw 
-                  new FormatException("No schema type for $type in prop $prop ");
-              }
-              props[name] = { "type": schemaType };
-            }
+            props[name] = ref(prop.type);
           }
         } else {
-          props[name] = _package._hasType(name)? 
-            props[name] = ref(name) : { "type":"string" };
+          if(_package._hasType(name)) {
+            prop.type = name;
+            props[name] = ref(name);
+          } else {
+            prop.type = 'string';
+            props[name] = { "type":"string" };
+          }
         }
       }
     });
@@ -197,6 +170,7 @@ class Package {
   bool defaultRequired = true;
   /// List of types (analagous to #/definitions/...
   List<SimpleSchema> types = [];
+  List<Enum> enums = [];
   Map<String,SimpleSchema> _typeMap = {};
   /// Map of defined types
   Map<String,SimpleSchema> get typeMap => _typeMap;
@@ -213,26 +187,52 @@ class Package {
     }
   }
 
-  void _addJMap(JMap m) => 
-    _addDefinition(m.name, {
+  void _addJMap(String t) {
+    _addDefinition('{$t}', {
       "type" : "object",
-      "additionalProperties" : ref(m.refId.camel)
+      "additionalProperties" : ref(t)
     });
+  }
 
-  void _addJList(JList l) =>
-    _addDefinition(l.name, {
+  void _addJList(String t) {
+    _addDefinition('[$t]', {
       "type" : "array",
-      "items" : ref(l.refId.camel)
+      "items" : ref(t)
     });
+  }
 
   bool _hasType(String type) => _schemaMap['definitions'].containsKey(type);
   
-  void _finalize() {
+  void finalize() {
+
+    if(_schemaMap != null) return;
 
     _schemaMap = { 'definitions' : {} };
 
+    enums.forEach((e) => e._finalize());
+
+    // Put empty stub entry for all schema types, including jMaps and jLists
     types.forEach((schema) {
       schema._finalize(this);
+      _addDefinition(schema.name, {});
+      String refType;
+      schema.properties.where((prop) => prop.type != null).forEach((prop) {
+        prop.type = _normalize(prop.type);
+        if((refType = mapOf(prop.type)) != null) {
+          _addJMap(refType);
+        } else if((refType = listOf(prop.type)) != null) {
+          _addJList(refType);
+        } else {
+        }
+      });
+    });
+
+    enums.forEach((enum) {
+      _addDefinition(enum.name, 
+          { 
+            "enum" : range(enum.values.length).toList()
+          }
+                     );
     });
 
     types.forEach((schema) {
@@ -241,7 +241,8 @@ class Package {
   }
 
   Future<Schema> get schema {
-    if(_schemaMap == null) _finalize();
+    if(_schemaMap == null) finalize();
+    _logger.info(jp(_schemaMap));
     return Schema.createSchema(_schemaMap);
   }
 
@@ -249,12 +250,13 @@ class Package {
 }
 // custom <part simple_schema>
 
+Enum enum(String id, [ List<String> values ]) {
+  return new Enum(new Id(id), values);
+}
 Package package(String id) => new Package(idFromString(id));
 SimpleSchema schema(String id) => new SimpleSchema(idFromString(id));
 Property property(String id) => new Property(idFromString(id));
 var prop = property;
-JMap jMap(String id) => new JMap(idFromString(id));
-JList jList(String id) => new JList(idFromString(id));
 ref(String name) => { r'$ref' : '#/definitions/$name' };
 
 // end <part simple_schema>

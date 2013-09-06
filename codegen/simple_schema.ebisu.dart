@@ -23,6 +23,7 @@ void main() {
     ..pubSpec.addDependency(new PubDependency('id'))
     ..pubSpec.addDependency(new PubDependency('json_schema'))
     ..pubSpec.addDependency(new PubDependency('ebisu'))
+    ..pubSpec.addDependency(new PubDependency('quiver'))
     ..pubSpec.doc = 'Provide declarative api for creating json schema'
     ..rootPath = '$_topDir'
     ..doc = 'The idea is provide simple api to provided guided creation of consistent json schema'
@@ -40,10 +41,27 @@ void main() {
       ..imports = [
         'package:ebisu/ebisu.dart',
         'package:ebisu/ebisu_dart_meta.dart',
+        'package:id/id.dart',
+        'package:simple_schema/simple_schema.dart',
       ],
       library('simple_schema')
       ..includeLogger = true
       ..variables = [
+        variable('list_re')
+        ..type = 'RegExp'
+        ..isFinal = true
+        ..isPublic = false
+        ..init = r'new RegExp(r"^\s*\[\s*(\w+)\s*\]\s*$")',
+        variable('map_re')
+        ..type = 'RegExp'
+        ..isFinal = true
+        ..isPublic = false
+        ..init = r'new RegExp(r"^\s*{\s*(\w+)\s*}\s*$")',
+        variable('normalize_re')
+        ..type = 'RegExp'
+        ..isFinal = true
+        ..isPublic = false
+        ..init = r'new RegExp(r"^\s*[\[{]\s*(\w+)\s*[\]}]\s*$")',
       ]
       ..enums = [
       ]
@@ -54,33 +72,25 @@ void main() {
         '"dart:json" as JSON',
         '"package:path/path.dart" as PATH',
         'package:json_schema/json_schema.dart',
+        'package:quiver/iterables.dart',
         'package:id/id.dart',
         'async',
       ]
       ..parts = [
         part('simple_schema')
         ..classes = [
-          class_('j_map')
-          ..doc = '''
-Represents new shcema type (i.e. a schema itself) where type is object
-and value schema is referenced by id
-'''
+          class_('enum')
           ..members = [
-            member('ref_id')
-            ..doc = 'Id of referred to schema for values in map'
+            member('id')
             ..type = 'Id'
             ..ctors = [''],
-          ],
-          class_('j_list')
-          ..doc = '''
-Represents new shcema type (i.e. a schema itself) with an items
-entry that has a reference schema referred to by refId.
-'''
-          ..members = [
-            member('ref_id')
-            ..doc = 'Id of referred to schema for items in list'
-            ..type = 'Id'
-            ..ctors = [''],
+            member('values')
+            ..ctorsOpt = ['']
+            ..type = 'List<String>'
+            ..classInit = '[]',
+            member('value_ids')
+            ..access = RO
+            ..type = 'List<Id>',
           ],
           class_('property')
           ..doc = 'Property entry in a schema'
@@ -98,8 +108,7 @@ entry that has a reference schema referred to by refId.
             member('is_required')
             ..type = 'bool',
             member('type')
-            ..doc = 'What type should be stored in the property'
-            ..type = 'dynamic',
+            ..doc = 'What type should be stored in the property',
           ],
           class_('simple_schema')
           ..doc = '''
@@ -136,6 +145,9 @@ A collection of packages
             member('types')
             ..doc = 'List of types (analagous to #/definitions/...'
             ..type = 'List<SimpleSchema>'
+            ..classInit = '[]',
+            member('enums')
+            ..type = 'List<Enum>'
             ..classInit = '[]',
             member('type_map')
             ..doc = 'Map of defined types'
