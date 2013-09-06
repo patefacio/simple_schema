@@ -1,0 +1,65 @@
+library simple_schema_ebisu;
+
+import 'package:ebisu/ebisu.dart';
+import 'package:ebisu/ebisu_dart_meta.dart';
+import 'package:id/id.dart';
+import 'package:simple_schema/simple_schema.dart';
+import 'package:logging/logging.dart';
+// custom <additional imports>
+// end <additional imports>
+
+
+final _logger = new Logger("simple_schema_ebisu");
+
+// custom <library simple_schema_ebisu>
+
+var _typeMap = {
+  'string' : 'String',
+  'integer' : 'int',
+  'number' : 'num',
+  'object' : 'Map',
+  'boolean' : 'bool',
+  'null' : 'null'
+};
+
+String _type(String type) {
+  String result = _typeMap[type];
+  if(result != null) return result;
+  if((result = listOf(type)) != null) 
+    return 'List<${Id.capitalize(result)}>';
+  if((result = mapOf(type)) != null) 
+    return 'Map<String,${Id.capitalize(result)}>';
+  return idFromString(type).capCamel;
+}
+
+Library makeLibraryFromSimpleSchema(Package package) {
+  _logger.info("Making library for ${package.id}");
+  var lib = library(package.id.snake);
+  package.types.forEach((t) {
+
+    var klass = class_(t.id.snake)
+      ..jsonSupport = true;
+
+    t.properties.forEach((prop) {
+
+      var m = member(prop.id.snake)
+        ..type = _type(prop.type);
+
+      if(prop.init != null)
+        m.classInit = '${prop.init}';
+
+      klass.members.add(m);
+
+    });
+    lib.classes.add(klass);
+  });
+
+  package.enums.forEach((e) {
+    lib.enums.add(enum_(e.id.snake)..values = e.valueIds);
+  });
+  
+  return lib;
+}
+
+// end <library simple_schema_ebisu>
+
