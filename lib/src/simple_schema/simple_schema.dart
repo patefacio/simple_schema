@@ -166,6 +166,7 @@ class Package {
 
   /// Id for property used to generate the name
   Id id;
+  List<Package> imports = [];
   /// Set up all schema in package to be required by default
   bool defaultRequired = true;
   /// List of types (analagous to #/definitions/...

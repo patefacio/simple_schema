@@ -36,13 +36,21 @@ void main() {
       ]
     ]
     ..libraries = [
-      library('simple_schema_ebisu')
+      library('simple_schema_dart')
       ..includeLogger = true
       ..imports = [
         'package:ebisu/ebisu.dart',
         'package:ebisu/ebisu_dart_meta.dart',
         'package:id/id.dart',
         'package:simple_schema/simple_schema.dart',
+      ],
+      library('simple_schema_dlang')
+      ..includeLogger = true
+      ..imports = [
+        'package:ebisu/ebisu.dart',
+        "'package:ebisu_dlang/dlang_meta.dart' as dlang",
+        'package:id/id.dart',
+        "'package:simple_schema/simple_schema.dart' as schema",
       ],
       library('simple_schema')
       ..includeLogger = true
@@ -138,6 +146,9 @@ A collection of packages
             ..doc = 'Id for property used to generate the name'
             ..type = 'Id'
             ..ctors = [''],
+            member('imports')
+            ..type = 'List<Package>'
+            ..classInit = '[]',
             member('default_required')
             ..doc = 'Set up all schema in package to be required by default'
             ..type = 'bool'
