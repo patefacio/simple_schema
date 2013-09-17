@@ -1,18 +1,11 @@
 part of simple_schema;
 
 class Enum {
-  Enum(
-    this.id,
-    [
-      this.values
-    ]
-  ) {
 
-  }
+  Enum(this.id, [ this.values ]);
 
   Id id;
   List<String> values = [];
-  List<Id> _valueIds;
   List<Id> get valueIds => _valueIds;
 
   // custom <class Enum>
@@ -24,21 +17,18 @@ class Enum {
   }
 
   // end <class Enum>
+  List<Id> _valueIds;
 }
 
 /// Property entry in a schema
 class Property {
-  Property(
-    this.id
-  ) {
 
-  }
+  Property(this.id);
 
   /// Id for property used to generate the name
   Id id;
   /// Initial value, as perk type will be gleaned if provided
   dynamic init;
-  SimpleSchema _schema;
   SimpleSchema get schema => _schema;
   bool isRequired;
   /// What type should be stored in the property
@@ -53,25 +43,20 @@ class Property {
   String get name => id.camel;
 
   // end <class Property>
+  SimpleSchema _schema;
 }
 
 /// A schema created from a simple, restricted set of rulesd defined by the
 /// members of this class for easy declarative construction.
 ///
 class SimpleSchema {
-  SimpleSchema(
-    [
-      this.id
-    ]
-  ) {
 
-  }
+  SimpleSchema([ this.id ]);
 
   /// Id for property used to generate the name
   Id id;
   /// List of properties for this schema
   List<Property> properties = [];
-  Package _package;
   Package get package => _package;
 
   // custom <class SimpleSchema>
@@ -153,16 +138,14 @@ class SimpleSchema {
 
 
   // end <class SimpleSchema>
+  Package _package;
 }
 
 /// A collection of packages
 ///
 class Package {
-  Package(
-    this.id
-  ) {
 
-  }
+  Package(this.id);
 
   /// Id for property used to generate the name
   Id id;
@@ -172,10 +155,8 @@ class Package {
   /// List of types (analagous to #/definitions/...
   List<SimpleSchema> types = [];
   List<Enum> enums = [];
-  Map<String,SimpleSchema> _typeMap = {};
   /// Map of defined types
   Map<String,SimpleSchema> get typeMap => _typeMap;
-  Map _schemaMap;
 
   // custom <class Package>
 
@@ -202,13 +183,23 @@ class Package {
     });
   }
 
-  bool _hasType(String type) => _schemaMap['definitions'].containsKey(type);
+  bool _hasType(String type) =>
+    _schemaMap['definitions'].containsKey(type) ||
+    imports.any((package) => package._hasType(type));
+
   
   void finalize() {
 
     if(_schemaMap != null) return;
 
     _schemaMap = { 'definitions' : {} };
+
+    imports.forEach((package) {
+      package._schemaMap['definitions'].forEach((k,v) {
+        assert(!_schemaMap['definitions'].containsKey(k));
+        _addDefinition(k, v);
+      });
+    });
 
     enums.forEach((e) => e._finalize());
 
@@ -231,7 +222,7 @@ class Package {
     enums.forEach((enum) {
       _addDefinition(enum.name, 
           { 
-            "enum" : range(enum.values.length).toList()
+            "enum" : enum.valueIds.map((ev) => ev.capCamel).toList()
           }
                      );
     });
@@ -243,11 +234,13 @@ class Package {
 
   Future<Schema> get schema {
     if(_schemaMap == null) finalize();
-    _logger.info(jp(_schemaMap));
+    _logger.info(_schemaMap.toString());
     return Schema.createSchema(_schemaMap);
   }
 
   // end <class Package>
+  Map<String,SimpleSchema> _typeMap = {};
+  Map _schemaMap;
 }
 // custom <part simple_schema>
 
@@ -258,7 +251,14 @@ Package package(String id) => new Package(idFromString(id));
 SimpleSchema schema(String id) => new SimpleSchema(idFromString(id));
 Property property(String id) => new Property(idFromString(id));
 var prop = property;
-ref(String name) => { r'$ref' : '#/definitions/$name' };
+
+var _jsonTypes = 
+  const [ 'array', 'integer', 'null', 'number', 'object', 'string', ];
+
+ref(String name) => (_jsonTypes.indexOf(name) != -1)? 
+  { "type" : name } : 
+  { r'$ref' : '#/definitions/$name' };
+
 
 // end <part simple_schema>
 

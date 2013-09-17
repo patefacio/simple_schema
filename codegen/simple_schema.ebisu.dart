@@ -22,7 +22,14 @@ void main() {
     ..pubSpec.version = '0.0.1'
     ..pubSpec.addDependency(new PubDependency('id'))
     ..pubSpec.addDependency(new PubDependency('json_schema'))
-    ..pubSpec.addDependency(new PubDependency('ebisu'))
+    ..pubSpec.addDependency(
+      pubdep('ebisu')
+      ..gitRef = 'HEAD'
+      ..path = 'git://github.com/patefacio/ebisu')
+    ..pubSpec.addDependency(
+      pubdep('ebisu_dlang')
+      ..gitRef = 'HEAD'
+      ..path = 'git://github.com/patefacio/ebisu_dlang')
     ..pubSpec.addDependency(new PubDependency('quiver'))
     ..pubSpec.doc = 'Provide declarative api for creating json schema'
     ..rootPath = '$_topDir'

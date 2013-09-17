@@ -35,7 +35,7 @@ String _type(String type) {
 
 Library makeLibraryFromSimpleSchema(Package package) {
   _logger.info("Making library for ${package.id}");
-  var lib = library(package.id.snake);
+  var lib = library('${package.id.snake}');
   package.types.forEach((t) {
 
     var classId = t.id.snake;
@@ -58,8 +58,25 @@ Library makeLibraryFromSimpleSchema(Package package) {
     lib.classes.add(klass);
   });
 
+  lib
+    ..variables.add(
+      variable('random_json_generator')
+      ..isPublic = false
+      ..init = 'new Random(0)')
+    ..imports.addAll([
+      '"package:ebisu/ebisu_utils.dart" as EBISU_UTILS',
+      'math'
+    ]);
+
+  package.imports.forEach((pkg) {
+    lib.imports.add('${pkg.id.snake}.dart');
+  });
+
   package.enums.forEach((e) {
-    lib.enums.add(enum_(e.id.snake)..values = e.valueIds);
+    lib.enums.add(
+      enum_(e.id.snake)
+      ..values = e.valueIds
+      ..jsonSupport = true);
   });
   
   return lib;

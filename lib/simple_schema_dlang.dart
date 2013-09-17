@@ -32,24 +32,40 @@ String _type(String type) {
   return idFromString(type).capCamel;
 }
 
-dlang.Package makePackageFromSimpleSchema(schema.Package schemaPackage) {
+dlang.Package makePackageFromSimpleSchema(schema.Package schemaPackage,
+    [ List<String> modulePath = const ['models'] ] ) {
   _logger.info("Making D package for ${schemaPackage.id}");
-  var dPackage = dlang.package(schemaPackage.id.snake);
-  var module = dlang.module('model')
+  var id = schemaPackage.id.snake;
+
+  var module = dlang.module('${id}')
     ..unitTest = true
     ..imports = [
       'opmix.mix',
       'vibe.data.json',
     ];
-  dPackage..modules = [ module ];
-      
+
+  dlang.Package dPackage;
+
+  modulePath
+    .reversed
+    .forEach((part) {
+      dPackage = (dPackage == null)?
+        (dlang.package(part)..modules = [ module ]) :
+        (dlang.package(part)..packages = [ dPackage ]);
+    });
+
+  schemaPackage.imports.forEach((pkg) {
+    module.imports.add("${modulePath.join('.')}.${pkg.id.snake}");
+  });
+
   schemaPackage.types.forEach((t) {
     var structId = t.id.snake;
     if(structId == 'date') {
       module.imports.add('datetime');
       return;
     }
-    var struct = dlang.struct(structId)        
+    var struct = dlang.struct(structId)
+      ..publicSection = true
       ..mixins = [
         dlang.tmixin('OpEquals')
       ];
@@ -61,6 +77,9 @@ dlang.Package makePackageFromSimpleSchema(schema.Package schemaPackage) {
 
       if(prop.init != null)
         m.init = '${prop.init}';
+
+      if(prop.type == 'date')
+        module.imports.add('datetime');
 
       struct.members.add(m);
 

@@ -5,29 +5,33 @@ homepage: https://github.com/patefacio/simple_schema
 description: >
   Provide declarative api for creating json schema
 dependencies:
-  id: "any"
+  id: ">=0.0.3"
 
-  json_schema: "any"
+  json_schema: ">=0.0.2"
 
-  logging: ">=0.6.21+3 <0.6.22"
+  ebisu:
+      git: 
+        url: git://github.com/patefacio/ebisu
+        ref: HEAD
 
-  logging_handlers: ">=0.5.0+3 <0.5.1"
+  ebisu_dlang:
+      git: 
+        url: git://github.com/patefacio/ebisu_dlang
+        ref: HEAD
+
+  quiver: "any"
+
+  logging: ">=0.7.1"
 
 # custom <simple_schema dependencies>
 
-  id:
-    path: /Users/dbdavidson/dev/open_source/id/
-
-  json_schema:
-    path: /Users/dbdavidson/dev/open_source/json_schema/
-
-  plus:
-    path: /Users/dbdavidson/dev/plusauri/dart/plus/
+#  plus:
+#    path: /Users/dbdavidson/dev/plusauri/dart/plus/
 
 # end <simple_schema dependencies>
 
 dev_dependencies:
-  hop: "0.24.2"
+  hop: ">=0.24.4"
 
 # custom <simple_schema dev dependencies>
 # end <simple_schema dev dependencies>
