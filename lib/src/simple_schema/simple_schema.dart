@@ -32,7 +32,7 @@ class Property {
   SimpleSchema get schema => _schema;
   bool isRequired;
   /// What type should be stored in the property
-  String type;
+  var type;
 
   // custom <class Property>
 
@@ -57,6 +57,7 @@ class SimpleSchema {
   Id id;
   /// List of properties for this schema
   List<Property> properties = [];
+  List<String> union = [];
   Package get package => _package;
 
   // custom <class SimpleSchema>
@@ -120,7 +121,13 @@ class SimpleSchema {
     });
 
 
-    var schemaMap = {'properties' : props};
+    var schemaMap = {};
+    if(properties.length > 0) schemaMap['properties'] = props;
+
+    union.forEach((entry) {
+      schemaMap.putIfAbsent('oneOf', () => [])
+        .add(ref(idFromString(entry).camel));
+    });
 
     var requiredProps = properties
     .where((prop) => 
@@ -135,7 +142,6 @@ class SimpleSchema {
 
     return schemaMap;
   }
-
 
   // end <class SimpleSchema>
   Package _package;
@@ -196,7 +202,9 @@ class Package {
 
     imports.forEach((package) {
       package._schemaMap['definitions'].forEach((k,v) {
-        assert(!_schemaMap['definitions'].containsKey(k));
+        if(_schemaMap['definitions'].containsKey(k)) {
+          assert(_schemaMap['definitions'][k].toString() == v.toString());
+        }
         _addDefinition(k, v);
       });
     });
@@ -209,12 +217,17 @@ class Package {
       _addDefinition(schema.name, {});
       String refType;
       schema.properties.where((prop) => prop.type != null).forEach((prop) {
-        prop.type = _normalize(prop.type);
-        if((refType = mapOf(prop.type)) != null) {
-          _addJMap(refType);
-        } else if((refType = listOf(prop.type)) != null) {
-          _addJList(refType);
-        } else {
+        if(prop.type is String) {
+          prop.type = _normalize(prop.type);
+          if((refType = mapOf(prop.type)) != null) {
+            _addJMap(refType);
+          } else if((refType = listOf(prop.type)) != null) {
+            _addJList(refType);
+          } else {
+          }
+        } else if(prop.type is SimpleSchema) {
+          _addDefinition(prop.type.name, prop.type._definition);
+          prop.type = prop.type.name;
         }
       });
     });
@@ -234,7 +247,7 @@ class Package {
 
   Future<Schema> get schema {
     if(_schemaMap == null) finalize();
-    _logger.info(_schemaMap.toString());
+    _logger.info(prettyJsonMap(_schemaMap));
     return Schema.createSchema(_schemaMap);
   }
 
@@ -259,6 +272,9 @@ ref(String name) => (_jsonTypes.indexOf(name) != -1)?
   { "type" : name } : 
   { r'$ref' : '#/definitions/$name' };
 
+SimpleSchema union(String id, List<String> oneOf) => 
+  schema(id)
+  ..union = oneOf;
 
 // end <part simple_schema>
 

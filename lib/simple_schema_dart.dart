@@ -3,8 +3,8 @@ library simple_schema_dart;
 import 'package:ebisu/ebisu.dart';
 import 'package:ebisu/ebisu_dart_meta.dart';
 import 'package:id/id.dart';
-import 'package:simple_schema/simple_schema.dart';
 import 'package:logging/logging.dart';
+import 'package:simple_schema/simple_schema.dart';
 // custom <additional imports>
 // end <additional imports>
 
@@ -27,9 +27,9 @@ String _type(String type) {
   String result = _typeMap[type];
   if(result != null) return result;
   if((result = listOf(type)) != null) 
-    return 'List<${Id.capitalize(result)}>';
+    return 'List<${_type(result)}>';
   if((result = mapOf(type)) != null) 
-    return 'Map<String,${Id.capitalize(result)}>';
+    return 'Map<String,${_type(result)}>';
   return idFromString(type).capCamel;
 }
 
@@ -42,6 +42,8 @@ Library makeLibraryFromSimpleSchema(Package package) {
     if(classId == 'date') return;
 
     var klass = class_(classId)
+      ..ctorSansNew = true
+      ..hasRandJson = true
       ..jsonSupport = true;
 
     t.properties.forEach((prop) {
@@ -61,10 +63,10 @@ Library makeLibraryFromSimpleSchema(Package package) {
   lib
     ..variables.add(
       variable('random_json_generator')
+      ..type = 'Random'
       ..isPublic = false
       ..init = 'new Random(0)')
     ..imports.addAll([
-      '"package:ebisu/ebisu_utils.dart" as EBISU_UTILS',
       'math'
     ]);
 
@@ -75,6 +77,7 @@ Library makeLibraryFromSimpleSchema(Package package) {
   package.enums.forEach((e) {
     lib.enums.add(
       enum_(e.id.snake)
+      ..hasRandJson = true
       ..values = e.valueIds
       ..jsonSupport = true);
   });

@@ -1,8 +1,8 @@
 library test_make_schema;
 
-import 'package:simple_schema/simple_schema.dart';
-import 'package:json_schema/json_schema.dart';
 import 'dart:convert' as convert;
+import 'package:json_schema/json_schema.dart';
+import 'package:simple_schema/simple_schema.dart';
 import 'package:unittest/unittest.dart';
 // custom <additional imports>
 import 'package:json_schema/schema_dot.dart';
@@ -38,9 +38,12 @@ main() {
           prop('a_array_of_number')..type = '[number]',
           prop('a_array_of_string')..type = '[string]',
           prop('a_array_of_pod')..type = '[pod]',
+          prop('a_map_of_int')..type = '{integer}',
+          prop('a_map_of_number')..type = '{number}',
+          prop('a_map_of_string')..type = '{string}',
+          prop('a_map_of_pod')..type = '{pod}',
         ],
       ];
-
 
     var checkResult = expectAsync1((schema) {
         schema = schema.definitions['compositeWithDefaults'];
@@ -79,6 +82,16 @@ main() {
             () => expect(schema.validate({"aArrayOfInt" : 
               [-1,2,3]}), true));
 
+        test('aArrayOfNumber is not an int',
+            () => expect(schema.validate({"aArrayOfNumber" : 3}), false));
+        test('aArrayOfNumber is not an array of string',
+            () => expect(schema.validate({"aArrayOfNumber" : ["a","b"]}), false));
+        test('aArrayOfNumber is an empty array',
+            () => expect(schema.validate({"aArrayOfNumber" : []}), true));
+        test('aArrayOfNumber is an array of number',
+            () => expect(schema.validate({"aArrayOfNumber" : 
+              [-1,2,3.14]}), true));
+
 
         test('aArrayOfString is not an int',
             () => expect(schema.validate({"aArrayOfString" : 3}), false));
@@ -91,6 +104,40 @@ main() {
         test('aArrayOfPod is an array of pod',
             () => expect(schema.validate({"aArrayOfPod" : 
               [ {'a' : 3}, {'a' : 5} ]}), true));
+
+
+        test('aMapOfInt is not an int',
+            () => expect(schema.validate({"aMapOfInt" : 3}), false));
+        test('aMapOfInt is not a map of string',
+            () => expect(schema.validate({"aMapOfInt" : {"a":"b"}}), false));
+        test('aMapOfInt is an empty map',
+            () => expect(schema.validate({"aMapOfInt" : {}}), true));
+        test('aMapOfInt is a map of int',
+            () => expect(schema.validate({"aMapOfInt" : 
+              {"a":-1, "b":2, "c":3} }), true));
+
+        test('aMapOfNumber is not an int',
+            () => expect(schema.validate({"aMapOfNumber" : 3}), false));
+        test('aMapOfNumber is not a map of string',
+            () => expect(schema.validate({"aMapOfNumber" : {"a":"b"}}), false));
+        test('aMapOfNumber is an empty map',
+            () => expect(schema.validate({"aMapOfNumber" : {}}), true));
+        test('aMapOfNumber is a map of number',
+            () => expect(schema.validate({"aMapOfNumber" : 
+              {"a":-15, "b":2, "c":3.14}}), true));
+
+
+        test('aMapOfString is not an int',
+            () => expect(schema.validate({"aMapOfString" : 3}), false));
+        test('aMapOfString is not a map of int',
+            () => expect(schema.validate({"aMapOfString" : {"a":1}}), false));
+        test('aMapOfString is a map of string',
+            () => expect(schema.validate({"aMapOfString" : 
+              {"a":"hi", "b":"mom"}}), true));
+
+        test('aMapOfPod is an map of pod',
+            () => expect(schema.validate({"aMapOfPod" : 
+              {'k1' : {'a' : 3}, 'k2' : {'a' : 5} } }), true));
 
     });
 

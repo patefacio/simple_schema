@@ -2,14 +2,15 @@ import "dart:io";
 import "package:path/path.dart" as path;
 import "package:ebisu/ebisu_dart_meta.dart";
 import 'package:logging/logging.dart';
-import 'package:logging_handlers/logging_handlers_shared.dart';
 
 String _topDir;
 
 void main() {
 
-  Logger.root.onRecord.listen(new PrintHandler());
-  Logger.root.level = Level.INFO;
+  //////////////////////////////////////////////////////////////////////
+  // Uncomment to log
+  //Logger.root.onRecord.listen((LogRecord r) =>
+  //    print("${r.loggerName} [${r.level}]:\t${r.message}"));
 
   Options options = new Options();
   String here = path.absolute(options.script);
@@ -84,8 +85,7 @@ void main() {
         'io',
         'math',
         'convert',
-        '"dart:json" as JSON',
-        '"package:path/path.dart" as PATH',
+        'package:ebisu/ebisu_utils.dart',
         'package:json_schema/json_schema.dart',
         'package:quiver/iterables.dart',
         'package:id/id.dart',
@@ -123,6 +123,7 @@ void main() {
             member('is_required')
             ..type = 'bool',
             member('type')
+            ..type = 'var'
             ..doc = 'What type should be stored in the property',
           ],
           class_('simple_schema')
@@ -139,6 +140,9 @@ members of this class for easy declarative construction.
             member('properties')
             ..doc = 'List of properties for this schema'
             ..type = 'List<Property>'
+            ..classInit = '[]',
+            member('union')
+            ..type = 'List<String>'
             ..classInit = '[]',
             member('package')
             ..access = RO

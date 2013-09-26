@@ -1,20 +1,19 @@
 library simple_schema;
 
+import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-import 'dart:convert';
-import 'dart:json' as JSON;
-import 'package:path/path.dart' as PATH;
-import 'package:json_schema/json_schema.dart';
-import 'package:quiver/iterables.dart';
+import 'package:ebisu/ebisu_utils.dart';
 import 'package:id/id.dart';
-import 'dart:async';
+import 'package:json_schema/json_schema.dart';
 import 'package:logging/logging.dart';
+import 'package:quiver/iterables.dart';
 // custom <additional imports>
 
 // end <additional imports>
 
-part "src/simple_schema/simple_schema.dart";
+part 'src/simple_schema/simple_schema.dart';
 
 final _logger = new Logger("simple_schema");
 

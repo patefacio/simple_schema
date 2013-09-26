@@ -3,8 +3,8 @@ library simple_schema_dlang;
 import 'package:ebisu/ebisu.dart';
 import 'package:ebisu_dlang/dlang_meta.dart' as dlang;
 import 'package:id/id.dart';
-import 'package:simple_schema/simple_schema.dart' as schema;
 import 'package:logging/logging.dart';
+import 'package:simple_schema/simple_schema.dart' as schema;
 // custom <additional imports>
 // end <additional imports>
 
@@ -26,9 +26,9 @@ String _type(String type) {
   String result = _typeMap[type];
   if(result != null) return result;
   if((result = schema.listOf(type)) != null) 
-    return '${Id.capitalize(result)}[]';
+    return 'immutable(${_type(result)})[]';
   if((result = schema.mapOf(type)) != null) 
-    return '${Id.capitalize(result)}[string]';
+    return '${_type(result)}[string]';
   return idFromString(type).capCamel;
 }
 
@@ -40,7 +40,7 @@ dlang.Package makePackageFromSimpleSchema(schema.Package schemaPackage,
   var module = dlang.module('${id}')
     ..unitTest = true
     ..imports = [
-      'opmix.mix',
+      // 'opmix.mix',
       'vibe.data.json',
     ];
 
@@ -67,7 +67,7 @@ dlang.Package makePackageFromSimpleSchema(schema.Package schemaPackage,
     var struct = dlang.struct(structId)
       ..publicSection = true
       ..mixins = [
-        dlang.tmixin('OpEquals')
+        //dlang.tmixin('OpEquals')
       ];
 
     t.properties.forEach((prop) {
