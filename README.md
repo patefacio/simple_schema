@@ -15,6 +15,8 @@ A library to define Json Schema that supports only a constrained but reasonable 
 
 Json Schema is sophisticated. Schema can contain schema, schema properties can themselves be schema (if referenced or anything else if not), sub-schema can be defined inline or in _#/definitions_, and there are a *huge* number of options that can be set. This is a strength of Json Schema, but could be viewed as a weakness if one just wants a simple schema to store structured JSON. For instance, POD data structures are very commonly used to pass data between client and server and in general the data has a shape that can be described much like a simple _C_ structure. This library provides a Dart declarative api for the creation of _simple schema_. With this approach there are no *inline* schemas.
 
+By constraining the usage of _JSON Schema_ to a simple subset, they become much more amenable to support via code generation. Included in this package is code generation support for creating equivalent Dart and D POD data structures with Json serialization built in.
+
 <!--- end <purpose> --->
 
 
