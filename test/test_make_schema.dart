@@ -16,8 +16,8 @@ import 'package:logging/logging.dart';
 main() { 
 // custom <main>
 
-  Logger.root.onRecord.listen((LogRecord r) =>
-      print("${r.loggerName}\t[${r.level}]:\t${r.message}"));
+  //Logger.root.onRecord.listen((LogRecord r) =>
+  //    print("${r.loggerName}\t[${r.level}]:\t${r.message}"));
 
   test('basic_types', () {
     var package = package('basic_types')

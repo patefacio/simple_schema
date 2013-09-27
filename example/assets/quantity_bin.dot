@@ -1,0 +1,87 @@
+digraph G {
+  fontname = "Bitstream Vera Sans"
+  fontsize = 8
+
+  node [
+    fontname = "Courier"
+    fontsize = 8
+    shape = "plaintext"
+  ]
+
+  edge [
+    fontname = "Bitstream Vera Sans"
+    fontsize = 8
+  ]
+
+"#" [
+label =<
+<table border="0" cellborder="0" cellpadding="1" bgcolor="white">
+<tr><td bgcolor="wheat" align="center" colspan="2" port="@path"><font color="black">#</font></td></tr>
+
+
+<tr><td bgcolor="wheat" align="center" colspan="2"><font color="black">Definitions</font></td></tr>
+<tr><td align="left" port="#@[point]">[point]</td>[point]<td bgcolor="grey" align="right"></td></tr>
+<tr><td align="left" port="#@interpolationType">interpolationType</td>interpolationType<td bgcolor="grey" align="right"></td></tr>
+<tr><td align="left" port="#@paymentFrequencyType">paymentFrequencyType</td>paymentFrequencyType<td bgcolor="grey" align="right"></td></tr>
+<tr><td align="left" port="#@point">point</td>point<td bgcolor="grey" align="right"></td></tr>
+<tr><td align="left" port="#@quantityBin">quantityBin</td>quantityBin<td bgcolor="grey" align="right"></td></tr>
+</table>
+>
+]
+"#/definitions/point" [
+label =<
+<table border="0" cellborder="0" cellpadding="1" bgcolor="white">
+<tr><td bgcolor="wheat" align="center" colspan="2" port="@path"><font color="black">#/definitions/point</font></td></tr>
+
+
+<tr><td bgcolor="wheat" align="center" colspan="2" port=""><font color="black">Properties</font></td></tr>
+<tr><td align="left" port="@x">! x</td>! x<td bgcolor="grey" align="right">number</td></tr>
+<tr><td align="left" port="@y">! y</td>! y<td bgcolor="grey" align="right">number</td></tr>
+</table>
+>
+]
+"#/definitions/quantityBin" [
+label =<
+<table border="0" cellborder="0" cellpadding="1" bgcolor="white">
+<tr><td bgcolor="wheat" align="center" colspan="2" port="@path"><font color="black">#/definitions/quantityBin</font></td></tr>
+
+
+<tr><td bgcolor="wheat" align="center" colspan="2" port=""><font color="black">Properties</font></td></tr>
+<tr><td align="left" port="@data">! data</td>! data<td bgcolor="grey" align="right">array</td></tr>
+<tr><td align="left" port="@interpolationType">! interpolationType</td>! interpolationType<td bgcolor="grey" align="right">enum=[Linear, Step, Cubic]</td></tr>
+</table>
+>
+]
+"#/definitions/interpolationType" [
+label =<
+<table border="0" cellborder="0" cellpadding="1" bgcolor="white">
+<tr><td bgcolor="wheat" align="center" colspan="2" port="@path"><font color="black">#/definitions/interpolationType</font></td></tr>
+
+
+<tr><td bgcolor="beige" align="center" colspan="2" port=""><font color="black">Enum Values</font></td></tr>
+<tr><td bgcolor="grey" align="center" colspan="2" port=""><font color="black">Linear</font></td></tr>
+<tr><td bgcolor="grey" align="center" colspan="2" port=""><font color="black">Step</font></td></tr>
+<tr><td bgcolor="grey" align="center" colspan="2" port=""><font color="black">Cubic</font></td></tr>
+</table>
+>
+]
+"#/definitions/paymentFrequencyType" [
+label =<
+<table border="0" cellborder="0" cellpadding="1" bgcolor="white">
+<tr><td bgcolor="wheat" align="center" colspan="2" port="@path"><font color="black">#/definitions/paymentFrequencyType</font></td></tr>
+
+
+<tr><td bgcolor="beige" align="center" colspan="2" port=""><font color="black">Enum Values</font></td></tr>
+<tr><td bgcolor="grey" align="center" colspan="2" port=""><font color="black">Monthly</font></td></tr>
+<tr><td bgcolor="grey" align="center" colspan="2" port=""><font color="black">Annual</font></td></tr>
+<tr><td bgcolor="grey" align="center" colspan="2" port=""><font color="black">Semiannual</font></td></tr>
+<tr><td bgcolor="grey" align="center" colspan="2" port=""><font color="black">Once</font></td></tr>
+</table>
+>
+]
+"#/definitions/quantityBin":"@data" -> "#/definitions/point":"@path";
+"#/definitions/quantityBin":"@interpolationType" -> "#/definitions/interpolationType":"@path";
+
+
+}
+  

@@ -9,10 +9,7 @@ dependencies:
 
   json_schema: ">=0.0.2"
 
-  ebisu:
-      git: 
-        url: git://github.com/patefacio/ebisu
-        ref: HEAD
+  ebisu: "any"
 
   ebisu_dlang:
       git: 
@@ -24,9 +21,6 @@ dependencies:
   logging: ">=0.7.1"
 
 # custom <simple_schema dependencies>
-
-#  plus:
-#    path: /Users/dbdavidson/dev/plusauri/dart/plus/
 
 # end <simple_schema dependencies>
 

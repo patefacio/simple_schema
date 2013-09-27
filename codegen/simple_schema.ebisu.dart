@@ -21,12 +21,9 @@ void main() {
     ..includeHop = true
     ..pubSpec.homepage = 'https://github.com/patefacio/simple_schema'
     ..pubSpec.version = '0.0.1'
-    ..pubSpec.addDependency(new PubDependency('id'))
-    ..pubSpec.addDependency(new PubDependency('json_schema'))
-    ..pubSpec.addDependency(
-      pubdep('ebisu')
-      ..gitRef = 'HEAD'
-      ..path = 'git://github.com/patefacio/ebisu')
+    ..pubSpec.addDependency(pubdep('id'))
+    ..pubSpec.addDependency(pubdep('json_schema'))
+    ..pubSpec.addDependency(pubdep('ebisu'))
     ..pubSpec.addDependency(
       pubdep('ebisu_dlang')
       ..gitRef = 'HEAD'

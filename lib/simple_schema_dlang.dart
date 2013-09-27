@@ -35,12 +35,16 @@ String _type(String type) {
 dlang.Package makePackageFromSimpleSchema(schema.Package schemaPackage,
     [ List<String> modulePath = const ['models'] ] ) {
   _logger.info("Making D package for ${schemaPackage.id}");
+
   var id = schemaPackage.id.snake;
+
+  if(modulePath.length == 0) {
+    modulePath = [ schemaPackage.id.snake ];
+  }
 
   var module = dlang.module('${id}')
     ..unitTest = true
     ..imports = [
-      // 'opmix.mix',
       'vibe.data.json',
     ];
 
