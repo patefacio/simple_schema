@@ -21,6 +21,8 @@ final RegExp _listRe = new RegExp(r"^\s*\[\s*(\w+)\s*\]\s*$");
 
 final RegExp _mapRe = new RegExp(r"^\s*{\s*(\w+)\s*}\s*$");
 
+final RegExp _enumMapRe = new RegExp(r"^(\w+)\s*\[\s*(\w+)\s*\]\s*$");
+
 final RegExp _normalizeRe = new RegExp(r"^\s*[\[{]\s*(\w+)\s*[\]}]\s*$");
 
 // custom <library simple_schema>
@@ -35,12 +37,19 @@ String mapOf(String t) {
   return match != null? match.group(1) : null;
 }
 
+enumMapOf(String t) => _enumMapRe.firstMatch(t);
+
 String _normalize(String t) {
   String refType;
+  var enumMatch;
   if((refType = listOf(t)) != null) {
     return '[${idFromString(refType).camel}]';
   } else if((refType = mapOf(t)) != null) {
     return '{${idFromString(refType).camel}}';
+  } else if((enumMatch = enumMapOf(t)) != null) {
+    var key = enumMatch.group(2);
+    var value = enumMatch.group(1);
+    return '${idFromString(value).camel}[${idFromString(key).camel}]';
   }
   return idFromString(t).camel;
 }

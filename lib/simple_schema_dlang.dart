@@ -19,16 +19,19 @@ var _typeMap = {
   'number' : 'double',
   'boolean' : 'bool',
   'null' : 'null',
-  'date' : 'DateTime',
+  'date' : 'Date',
 };
 
 String _type(String type) {
   String result = _typeMap[type];
+  var enumMatch;
   if(result != null) return result;
   if((result = schema.listOf(type)) != null) 
     return 'immutable(${_type(result)})[]';
   if((result = schema.mapOf(type)) != null) 
     return '${_type(result)}[string]';
+  if((enumMatch = schema.enumMapOf(type)) != null)
+    return '${_type(enumMatch.group(1))}[${_type(enumMatch.group(2))}]';
   return idFromString(type).capCamel;
 }
 
@@ -43,7 +46,9 @@ dlang.Package makePackageFromSimpleSchema(schema.Package schemaPackage,
   }
 
   var module = dlang.module('${id}')
+    ..customImports = true
     ..unitTest = true
+    ..publicSection = true
     ..imports = [
       'vibe.data.json',
     ];
@@ -59,7 +64,7 @@ dlang.Package makePackageFromSimpleSchema(schema.Package schemaPackage,
     });
 
   schemaPackage.imports.forEach((pkg) {
-    module.imports.add("${modulePath.join('.')}.${pkg.id.snake}");
+    module.publicImports.add("${modulePath.join('.')}.${pkg.id.snake}");
   });
 
   schemaPackage.types.forEach((t) {

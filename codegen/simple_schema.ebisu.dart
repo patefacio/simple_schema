@@ -70,6 +70,11 @@ void main() {
         ..isFinal = true
         ..isPublic = false
         ..init = r'new RegExp(r"^\s*{\s*(\w+)\s*}\s*$")',
+        variable('enum_map_re')
+        ..type = 'RegExp'
+        ..isFinal = true
+        ..isPublic = false
+        ..init = r'new RegExp(r"^(\w+)\s*\[\s*(\w+)\s*\]\s*$")',
         variable('normalize_re')
         ..type = 'RegExp'
         ..isFinal = true

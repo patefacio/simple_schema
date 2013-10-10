@@ -22,6 +22,9 @@ main() {
   test('basic_types', () {
     var package = package('basic_types')
       ..defaultRequired = false
+      ..enums = [
+        enum_('color', [ 'red', 'green', 'blue' ])
+      ]
       ..types = [
         schema('pod')
         ..properties = [
@@ -42,6 +45,9 @@ main() {
           prop('a_map_of_number')..type = '{number}',
           prop('a_map_of_string')..type = '{string}',
           prop('a_map_of_pod')..type = '{pod}',
+          prop('a_map_string_to_pod')..type = 'pod[string]',
+          prop('a_map_of_int')..type = 'integer[string]',
+          prop('a_map_indexed_by_color')..type = 'integer[color]',
         ],
       ];
 
@@ -138,6 +144,22 @@ main() {
         test('aMapOfPod is an map of pod',
             () => expect(schema.validate({"aMapOfPod" : 
               {'k1' : {'a' : 3}, 'k2' : {'a' : 5} } }), true));
+
+        test('aMapStringToPod is an map of pod',
+            () => expect(schema.validate({"aMapStringToPod" : 
+              {'k1' : {'a' : 3}, 'k2' : {'a' : 5} } }), true));
+
+        test('aMapOfInt is an map of int',
+            () => expect(schema.validate({"aMapOfInt" : 
+              {'k1' : 3, 'k2' : 5 } }), true));
+
+        test('aMapIndexedByColor ',
+            () => expect(schema.validate({"aMapIndexedByColor" : 
+              {'Red' : 3, 'Green' : 5 } }), true));
+
+        test('aMapIndexedByColor ',
+            () => expect(schema.validate({"aMapIndexedByColor" : 
+              {'Red' : 3, 'Purple' : 5 } }), false));
 
     });
 

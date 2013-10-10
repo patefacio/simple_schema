@@ -189,6 +189,13 @@ class Package {
     });
   }
 
+  void _addEnumMap(String k, String v) {
+    _addDefinition('${idFromString(v).camel}[${idFromString(k).camel}]', {
+      "type" : "object",
+      "additionalProperties" : ref(v)
+    });
+  }
+  
   bool _hasType(String type) =>
     _schemaMap['definitions'].containsKey(type) ||
     imports.any((package) => package._hasType(type));
@@ -224,6 +231,11 @@ class Package {
           } else if((refType = listOf(prop.type)) != null) {
             _addJList(refType);
           } else {
+            var enumMatch = enumMapOf(prop.type);
+            if(enumMatch != null) {
+              _addEnumMap(enumMatch.group(2), enumMatch.group(1));
+            } else {
+            }
           }
         } else if(prop.type is SimpleSchema) {
           _addDefinition(prop.type.name, prop.type._definition);
@@ -257,7 +269,7 @@ class Package {
 }
 // custom <part simple_schema>
 
-Enum enum(String id, [ List<String> values ]) {
+Enum ssEnum(String id, [ List<String> values ]) {
   return new Enum(new Id(id), values);
 }
 Package package(String id) => new Package(idFromString(id));

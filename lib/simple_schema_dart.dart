@@ -19,17 +19,20 @@ var _typeMap = {
   'number' : 'num',
   'object' : 'Map',
   'boolean' : 'bool',
-  'date' : 'DateTime',
+  'date' : 'Date',
   'null' : 'null'
 };
 
 String _type(String type) {
   String result = _typeMap[type];
+  var enumMatch;
   if(result != null) return result;
   if((result = listOf(type)) != null) 
     return 'List<${_type(result)}>';
   if((result = mapOf(type)) != null) 
     return 'Map<String,${_type(result)}>';
+  if((enumMatch = enumMapOf(type)) != null)
+    return 'Map<${_type(enumMatch.group(2))},${_type(enumMatch.group(1))}>';
   return idFromString(type).capCamel;
 }
 
@@ -51,8 +54,16 @@ Library makeLibraryFromSimpleSchema(Package package) {
       var m = member(prop.id.snake)
         ..type = _type(prop.type);
 
-      if(prop.init != null)
+      if(prop.init != null) {
         m.classInit = '${prop.init}';
+      } else {
+        if(m.type.contains('List<')) {
+          m.classInit = '[]';
+        } else if(m.type.contains('Map<')) {
+          m.classInit = '{}';
+        }
+      }
+
 
       klass.members.add(m);
 
