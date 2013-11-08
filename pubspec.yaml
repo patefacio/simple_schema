@@ -1,20 +1,17 @@
 name: simple_schema
-version: 0.0.1
+version: 0.0.2
 author: Daniel Davidson <dbdavidson@yahoo.com>
 homepage: https://github.com/patefacio/simple_schema
 description: >
   Provide declarative api for creating json schema
 dependencies:
-  id: ">=0.0.3"
+  id: ">=0.0.5"
 
-  json_schema: ">=0.0.2"
+  json_schema: ">=1.0.0"
 
-  ebisu: "any"
+  ebisu: ">=0.0.4"
 
-  ebisu_dlang:
-      git: 
-        url: git://github.com/patefacio/ebisu_dlang
-        ref: HEAD
+  ebisu_dlang: ">=0.0.4"
 
   quiver: "any"
 
@@ -25,7 +22,7 @@ dependencies:
 # end <simple_schema dependencies>
 
 dev_dependencies:
-  hop: ">=0.24.4"
+  hop: ">=0.27.0"
 
 # custom <simple_schema dev dependencies>
 # end <simple_schema dev dependencies>

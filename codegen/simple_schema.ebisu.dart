@@ -19,7 +19,7 @@ void main() {
     ..includeReadme = true
     ..includeHop = true
     ..pubSpec.homepage = 'https://github.com/patefacio/simple_schema'
-    ..pubSpec.version = '0.0.1'
+    ..pubSpec.version = '0.0.2'
     ..pubSpec.addDependency(pubdep('id'))
     ..pubSpec.addDependency(pubdep('json_schema'))
     ..pubSpec.addDependency(pubdep('ebisu'))
