@@ -13,12 +13,12 @@ main() {
 
   var outPath = './assets';
 
-  var package = package('quantity_bin')
+  var pkg = package('quantity_bin')
     ..defaultRequired = true
     ..enums = [
-      enum('interpolation_type', 
+      ssEnum('interpolation_type', 
           [ 'linear', 'step', 'cubic' ]),
-      enum('payment_frequency_type',
+      ssEnum('payment_frequency_type',
           [
             'monthly',
             'annual',
@@ -39,21 +39,21 @@ main() {
       ],
     ];     
 
-  package..finalize();
+  pkg..finalize();
   {
-    var library = makeLibraryFromSimpleSchema(package);
+    var library = makeLibraryFromSimpleSchema(pkg);
     library.path = join(outPath, 'dart_generated');
     library.generate();
   }
   {
-    var dPackage = dlang.makePackageFromSimpleSchema(package, []);
+    var dPackage = dlang.makePackageFromSimpleSchema(pkg);
     dlang_meta.system('quantity_bin')
     ..rootPath = join(outPath, 'dlang_generated')
     ..packages = [ dPackage ]
     ..generate();
   }
 
-  package
+  pkg
     .schema
     .then((schema) {
       mergeWithFile(createDot(schema), join(outPath, 'quantity_bin.dot'));

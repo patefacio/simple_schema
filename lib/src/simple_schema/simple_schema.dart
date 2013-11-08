@@ -244,10 +244,10 @@ class Package {
       });
     });
 
-    enums.forEach((enum) {
-      _addDefinition(enum.name, 
+    enums.forEach((e) {
+      _addDefinition(e.name, 
           { 
-            "enum" : enum.valueIds.map((ev) => ev.capCamel).toList()
+            "enum" : e.valueIds.map((ev) => ev.capCamel).toList()
           }
                      );
     });

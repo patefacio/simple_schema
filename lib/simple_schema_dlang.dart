@@ -27,7 +27,7 @@ String _type(String type) {
   var enumMatch;
   if(result != null) return result;
   if((result = schema.listOf(type)) != null) 
-    return 'immutable(${_type(result)})[]';
+    return 'const(${_type(result)})[]';
   if((result = schema.mapOf(type)) != null) 
     return '${_type(result)}[string]';
   if((enumMatch = schema.enumMapOf(type)) != null)
@@ -36,7 +36,11 @@ String _type(String type) {
 }
 
 dlang.Package makePackageFromSimpleSchema(schema.Package schemaPackage,
-    [ List<String> modulePath = const ['models'] ] ) {
+    { 
+      List<String> modulePath : const ['models'],
+      Map overrideImports : const {},
+      Map requiredImports : const {}
+    } ) {
   _logger.info("Making D package for ${schemaPackage.id}");
 
   var id = schemaPackage.id.snake;
@@ -45,13 +49,13 @@ dlang.Package makePackageFromSimpleSchema(schema.Package schemaPackage,
     modulePath = [ schemaPackage.id.snake ];
   }
 
+  var imports = [ 'vibe.data.json', 'stdio', 'opmix.ut' ];
+
   var module = dlang.module('${id}')
     ..customImports = true
     ..unitTest = true
     ..publicSection = true
-    ..imports = [
-      'vibe.data.json',
-    ];
+    ..imports = imports;
 
   dlang.Package dPackage;
 
@@ -72,6 +76,13 @@ dlang.Package makePackageFromSimpleSchema(schema.Package schemaPackage,
     if(structId == 'date') {
       module.imports.add('datetime');
       return;
+    }
+    if(overrideImports.containsKey(structId)) {
+      module.imports.add(overrideImports[structId]);
+      return;
+    }
+    if(requiredImports.containsKey(structId)) {
+      module.imports.add(requiredImports[structId]);
     }
     var struct = dlang.struct(structId)
       ..publicSection = true
@@ -98,6 +109,12 @@ dlang.Package makePackageFromSimpleSchema(schema.Package schemaPackage,
   });
 
   schemaPackage.enums.forEach((e) {
+
+    if(overrideImports.containsKey(e.id.snake)) {
+      module.imports.add(overrideImports[e.id.snake]);
+      return;
+    }
+
     module.enums.add(dlang
         .enum_(e.id.snake)
         ..values = e.valueIds.map((v) => dlang.ev(v.id)).toList());

@@ -1,5 +1,6 @@
 library quantity_bin;
 
+import 'dart:convert' as convert;
 import 'dart:math';
 import 'package:ebisu/ebisu_utils.dart' as ebisu_utils;
 // custom <additional imports>
@@ -23,36 +24,26 @@ class InterpolationType {
 
   String toString() {
     switch(this) {
-      case LINEAR: return "LINEAR";
-      case STEP: return "STEP";
-      case CUBIC: return "CUBIC";
+      case LINEAR: return "Linear";
+      case STEP: return "Step";
+      case CUBIC: return "Cubic";
     }
   }
 
   static InterpolationType fromString(String s) {
     switch(s) {
-      case "LINEAR": return LINEAR;
-      case "STEP": return STEP;
-      case "CUBIC": return CUBIC;
+      case "Linear": return LINEAR;
+      case "Step": return STEP;
+      case "Cubic": return CUBIC;
     }
   }
 
-  int toJson() {
-    return this.value;
-  }
+  int toJson() => value;
+  static InterpolationType fromJson(int v) => values[v];
 
-  static int randJson() {
-   return _randomJsonGenerator.nextInt(3);
+  static String randJson() {
+   return values[_randomJsonGenerator.nextInt(3)].toString();
   }
-
-  static InterpolationType fromJson(int v) {
-    switch(v) {
-      case 0: return LINEAR;
-      case 1: return STEP;
-      case 2: return CUBIC;
-    }
-  }
-
 
 }
 
@@ -75,39 +66,28 @@ class PaymentFrequencyType {
 
   String toString() {
     switch(this) {
-      case MONTHLY: return "MONTHLY";
-      case ANNUAL: return "ANNUAL";
-      case SEMIANNUAL: return "SEMIANNUAL";
-      case ONCE: return "ONCE";
+      case MONTHLY: return "Monthly";
+      case ANNUAL: return "Annual";
+      case SEMIANNUAL: return "Semiannual";
+      case ONCE: return "Once";
     }
   }
 
   static PaymentFrequencyType fromString(String s) {
     switch(s) {
-      case "MONTHLY": return MONTHLY;
-      case "ANNUAL": return ANNUAL;
-      case "SEMIANNUAL": return SEMIANNUAL;
-      case "ONCE": return ONCE;
+      case "Monthly": return MONTHLY;
+      case "Annual": return ANNUAL;
+      case "Semiannual": return SEMIANNUAL;
+      case "Once": return ONCE;
     }
   }
 
-  int toJson() {
-    return this.value;
-  }
+  int toJson() => value;
+  static PaymentFrequencyType fromJson(int v) => values[v];
 
-  static int randJson() {
-   return _randomJsonGenerator.nextInt(4);
+  static String randJson() {
+   return values[_randomJsonGenerator.nextInt(4)].toString();
   }
-
-  static PaymentFrequencyType fromJson(int v) {
-    switch(v) {
-      case 0: return MONTHLY;
-      case 1: return ANNUAL;
-      case 2: return SEMIANNUAL;
-      case 3: return ONCE;
-    }
-  }
-
 
 }
 
@@ -126,6 +106,7 @@ class Point {
   }
 
   static Point fromJson(String json) {
+    if(json == null) return null;
     Map jsonMap = convert.JSON.decode(json);
     Point result = new Point();
     result._fromJsonMapImpl(jsonMap);
@@ -133,6 +114,7 @@ class Point {
   }
 
   static Point fromJsonMap(Map jsonMap) {
+    if(jsonMap == null) return null;
     Point result = new Point();
     result._fromJsonMapImpl(jsonMap);
     return result;
@@ -142,6 +124,7 @@ class Point {
     x = jsonMap["x"];
     y = jsonMap["y"];
   }
+
   static Map randJson() {
     return {
     "x": ebisu_utils.randJson(_randomJsonGenerator, num),
@@ -154,7 +137,7 @@ point() => new Point();
 
 class QuantityBin {
   InterpolationType interpolationType;
-  List<Point> data;
+  List<Point> data = [];
 
   // custom <class QuantityBin>
   // end <class QuantityBin>
@@ -167,6 +150,7 @@ class QuantityBin {
   }
 
   static QuantityBin fromJson(String json) {
+    if(json == null) return null;
     Map jsonMap = convert.JSON.decode(json);
     QuantityBin result = new QuantityBin();
     result._fromJsonMapImpl(jsonMap);
@@ -174,6 +158,7 @@ class QuantityBin {
   }
 
   static QuantityBin fromJsonMap(Map jsonMap) {
+    if(jsonMap == null) return null;
     QuantityBin result = new QuantityBin();
     result._fromJsonMapImpl(jsonMap);
     return result;
@@ -183,12 +168,16 @@ class QuantityBin {
     interpolationType = (jsonMap["interpolationType"] is Map)?
       InterpolationType.fromJsonMap(jsonMap["interpolationType"]) :
       InterpolationType.fromJson(jsonMap["interpolationType"]);
-    // data list of Point
-    data = new List<Point>();
+
+    // data is List<Point>
+    data = [];
     jsonMap["data"].forEach((v) {
-      data.add(Point.fromJsonMap(v));
+      data.add((v is Map)?
+      Point.fromJsonMap(v) :
+      Point.fromJson(v));
     });
   }
+
   static Map randJson() {
     return {
     "interpolationType": ebisu_utils.randJson(_randomJsonGenerator, InterpolationType.randJson),

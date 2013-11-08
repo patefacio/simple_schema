@@ -12,8 +12,7 @@ void main() {
   //Logger.root.onRecord.listen((LogRecord r) =>
   //    print("${r.loggerName} [${r.level}]:\t${r.message}"));
 
-  Options options = new Options();
-  String here = path.absolute(options.script);
+  String here = path.absolute(Platform.script.path);
   _topDir = path.dirname(path.dirname(here));
   System ebisu = system('simple_schema')
     ..license = 'boost'
