@@ -1,4 +1,4 @@
-library simple_schema;
+library simple_schema.simple_schema;
 
 import 'dart:async';
 import 'dart:convert';
@@ -15,16 +15,12 @@ import 'package:quiver/iterables.dart';
 
 part 'src/simple_schema/simple_schema.dart';
 
-final _logger = new Logger("simple_schema");
+final _logger = new Logger('simple_schema');
 
 final RegExp _listRe = new RegExp(r"^\s*\[\s*(\w+)\s*\]\s*$");
-
 final RegExp _mapRe = new RegExp(r"^\s*{\s*(\w+)\s*}\s*$");
-
 final RegExp _enumMapRe = new RegExp(r"^(\w+)\s*\[\s*(\w+)\s*\]\s*$");
-
 final RegExp _normalizeRe = new RegExp(r"^\s*[\[{]\s*(\w+)\s*[\]}]\s*$");
-
 // custom <library simple_schema>
 
 String listOf(String t) {
@@ -55,4 +51,3 @@ String _normalize(String t) {
 }
 
 // end <library simple_schema>
-

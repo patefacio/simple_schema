@@ -47,6 +47,7 @@ void main() {
         'package:ebisu/ebisu_dart_meta.dart',
         'package:id/id.dart',
         'package:simple_schema/simple_schema.dart',
+        'package:quiver/iterables.dart',
       ],
       library('simple_schema_dlang')
       ..includeLogger = true
@@ -115,6 +116,8 @@ void main() {
             ..doc = 'Id for property used to generate the name'
             ..type = 'Id'
             ..ctors = [''],
+            member('doc')
+            ..doc = 'Documentation for the property',
             member('init')
             ..type = 'dynamic'
             ..doc = 'Initial value, as perk type will be gleaned if provided',
@@ -129,7 +132,7 @@ void main() {
           ],
           class_('simple_schema')
           ..doc = '''
-A schema created from a simple, restricted set of rulesd defined by the
+A schema created from a simple, restricted set of rules defined by the
 members of this class for easy declarative construction.
 '''
           ..ctorSansNew = false
@@ -138,6 +141,8 @@ members of this class for easy declarative construction.
             ..doc = 'Id for property used to generate the name'
             ..type = 'Id'
             ..ctorsOpt = [''],
+            member('doc')
+            ..doc = 'Documentation for the property',
             member('properties')
             ..doc = 'List of properties for this schema'
             ..type = 'List<Property>'
@@ -186,4 +191,3 @@ A collection of packages
     ];
   ebisu.generate();
 }
-

@@ -1,4 +1,4 @@
-library simple_schema_dlang;
+library simple_schema.simple_schema_dlang;
 
 import 'package:ebisu/ebisu.dart';
 import 'package:ebisu_dlang/dlang_meta.dart' as dlang;
@@ -8,8 +8,7 @@ import 'package:simple_schema/simple_schema.dart' as schema;
 // custom <additional imports>
 // end <additional imports>
 
-
-final _logger = new Logger("simple_schema_dlang");
+final _logger = new Logger('simple_schema_dlang');
 
 // custom <library simple_schema_dlang>
 
@@ -26,9 +25,9 @@ String _type(String type) {
   String result = _typeMap[type];
   var enumMatch;
   if(result != null) return result;
-  if((result = schema.listOf(type)) != null) 
-    return 'const(${_type(result)})[]';
-  if((result = schema.mapOf(type)) != null) 
+  if((result = schema.listOf(type)) != null)
+    return 'immutable(${_type(result)})[]';
+  if((result = schema.mapOf(type)) != null)
     return '${_type(result)}[string]';
   if((enumMatch = schema.enumMapOf(type)) != null)
     return '${_type(enumMatch.group(1))}[${_type(enumMatch.group(2))}]';
@@ -36,7 +35,7 @@ String _type(String type) {
 }
 
 dlang.Package makePackageFromSimpleSchema(schema.Package schemaPackage,
-    { 
+    {
       List<String> modulePath : const ['models'],
       Map overrideImports : const {},
       Map requiredImports : const {}
@@ -119,9 +118,8 @@ dlang.Package makePackageFromSimpleSchema(schema.Package schemaPackage,
         .enum_(e.id.snake)
         ..values = e.valueIds.map((v) => dlang.ev(v.id)).toList());
   });
-  
+
   return dPackage;
 }
 
 // end <library simple_schema_dlang>
-

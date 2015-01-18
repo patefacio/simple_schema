@@ -1,8 +1,6 @@
-import 'utils.dart';
 import 'package:unittest/unittest.dart';
+import 'package:logging/logging.dart';
 import 'test_make_schema.dart' as test_make_schema;
-
-get rootPath => packageRootPath;
 
 void testCore(Configuration config) {
   unittestConfiguration = config;
@@ -10,6 +8,11 @@ void testCore(Configuration config) {
 }
 
 main() {
+  Logger.root.level = Level.OFF;
+  Logger.root.onRecord.listen((LogRecord rec) {
+    print('${rec.level.name}: ${rec.time}: ${rec.message}');
+  });
+
   test_make_schema.main();
 }
 
