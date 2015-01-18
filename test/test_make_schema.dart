@@ -1,4 +1,4 @@
-library test_make_schema;
+library simple_schema.test.test_make_schema;
 
 import 'dart:convert' as convert;
 import 'package:json_schema/json_schema.dart';
@@ -9,11 +9,9 @@ import 'package:json_schema/schema_dot.dart';
 import 'package:logging/logging.dart';
 // end <additional imports>
 
-
 // custom <library test_make_schema>
 // end <library test_make_schema>
-
-main() { 
+main() {
 // custom <main>
 
   //Logger.root.onRecord.listen((LogRecord r) =>

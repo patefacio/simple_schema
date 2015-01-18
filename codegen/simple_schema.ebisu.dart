@@ -20,13 +20,6 @@ void main() {
     ..includeHop = true
     ..pubSpec.homepage = 'https://github.com/patefacio/simple_schema'
     ..pubSpec.version = '0.0.2'
-    ..pubSpec.addDependency(pubdep('id'))
-    ..pubSpec.addDependency(pubdep('json_schema'))
-    ..pubSpec.addDependency(pubdep('ebisu'))
-    ..pubSpec.addDependency(
-      pubdep('ebisu_dlang')
-      ..gitRef = 'HEAD'
-      ..path = 'git://github.com/patefacio/ebisu_dlang')
     ..pubSpec.addDependency(new PubDependency('quiver'))
     ..pubSpec.doc = 'Provide declarative api for creating json schema'
     ..rootPath = '$_topDir'
@@ -48,14 +41,6 @@ void main() {
         'package:id/id.dart',
         'package:simple_schema/simple_schema.dart',
         'package:quiver/iterables.dart',
-      ],
-      library('simple_schema_dlang')
-      ..includeLogger = true
-      ..imports = [
-        'package:ebisu/ebisu.dart',
-        "'package:ebisu_dlang/dlang_meta.dart' as dlang",
-        'package:id/id.dart',
-        "'package:simple_schema/simple_schema.dart' as schema",
       ],
       library('simple_schema')
       ..includeLogger = true
