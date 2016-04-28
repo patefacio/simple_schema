@@ -16,13 +16,12 @@ void main() {
   _topDir = path.dirname(path.dirname(here));
   System ebisu = system('simple_schema')
     ..license = 'boost'
-    ..includeReadme = true
-    ..includeHop = true
     ..pubSpec.homepage = 'https://github.com/patefacio/simple_schema'
     ..pubSpec.version = '0.0.2'
     ..pubSpec.addDependency(new PubDependency('quiver'))
     ..pubSpec.doc = 'Provide declarative api for creating json schema'
     ..rootPath = '$_topDir'
+    ..includesHop = true
     ..doc = 'The idea is provide simple api to provided guided creation of consistent json schema'
     ..testLibraries = [
       library('test_make_schema')
@@ -34,7 +33,7 @@ void main() {
     ]
     ..libraries = [
       library('simple_schema_dart')
-      ..includeLogger = true
+      ..includesLogger = true
       ..imports = [
         'package:ebisu/ebisu.dart',
         'package:ebisu/ebisu_dart_meta.dart',
@@ -43,7 +42,7 @@ void main() {
         'package:quiver/iterables.dart',
       ],
       library('simple_schema')
-      ..includeLogger = true
+      ..includesLogger = true
       ..variables = [
         variable('list_re')
         ..type = 'RegExp'
@@ -72,7 +71,7 @@ void main() {
         'io',
         'math',
         'convert',
-        'package:ebisu/ebisu_utils.dart',
+        'package:ebisu/ebisu.dart',
         'package:json_schema/json_schema.dart',
         'package:quiver/iterables.dart',
         'package:id/id.dart',
@@ -120,7 +119,7 @@ void main() {
 A schema created from a simple, restricted set of rules defined by the
 members of this class for easy declarative construction.
 '''
-          ..ctorSansNew = false
+          ..hasCtorSansNew = false
           ..members = [
             member('id')
             ..doc = 'Id for property used to generate the name'

@@ -6,6 +6,7 @@ import 'package:id/id.dart';
 import 'package:logging/logging.dart';
 import 'package:quiver/iterables.dart';
 import 'package:simple_schema/simple_schema.dart';
+
 // custom <additional imports>
 // end <additional imports>
 
@@ -137,3 +138,5 @@ Library makeLibraryFromSimpleSchema(Package package,
 }
 
 // end <library simple_schema_dart>
+
+

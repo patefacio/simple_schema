@@ -6,30 +6,33 @@ description: >
   Provide declarative api for creating json schema
 dependencies:
   quiver: "any"
-  logging: "any"
 
 # custom <simple_schema dependencies>
 
-  id:
-    git: git://github.com/patefacio/id
+  id: "^1.0.13"
 
-  ebisu:
-    git: git://github.com/patefacio/ebisu
+  ebisu: "^0.6.19"
 
-  json_schema:
-    git: git://github.com/patefacio/json_schema
+  json_schema: "^1.0.3"
 
 
 # end <simple_schema dependencies>
 
 dev_dependencies:
-  unittest: ">=0.9.0 < 0.10.0"
+  yaml: "any"
   browser: "any"
   hop: "any"
   hop_docgen: "any"
 
 # custom <simple_schema dev dependencies>
+
+  test: ">=0.12.0 < 0.14.0"
+
 # end <simple_schema dev dependencies>
+
+dependency_overrides:
+# custom <simple_schema dependency overrides>
+# end <simple_schema dependency overrides>
 
 transformers:
 

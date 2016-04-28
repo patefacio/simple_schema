@@ -1,11 +1,5 @@
-import 'package:unittest/unittest.dart';
 import 'package:logging/logging.dart';
 import 'test_make_schema.dart' as test_make_schema;
-
-void testCore(Configuration config) {
-  unittestConfiguration = config;
-  main();
-}
 
 main() {
   Logger.root.level = Level.OFF;

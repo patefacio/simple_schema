@@ -4,11 +4,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-import 'package:ebisu/ebisu_utils.dart';
+import 'package:ebisu/ebisu.dart';
 import 'package:id/id.dart';
 import 'package:json_schema/json_schema.dart';
 import 'package:logging/logging.dart';
 import 'package:quiver/iterables.dart';
+
 // custom <additional imports>
 
 // end <additional imports>
@@ -21,6 +22,7 @@ final RegExp _listRe = new RegExp(r"^\s*\[\s*(\w+)\s*\]\s*$");
 final RegExp _mapRe = new RegExp(r"^\s*{\s*(\w+)\s*}\s*$");
 final RegExp _enumMapRe = new RegExp(r"^(\w+)\s*\[\s*(\w+)\s*\]\s*$");
 final RegExp _normalizeRe = new RegExp(r"^\s*[\[{]\s*(\w+)\s*[\]}]\s*$");
+
 // custom <library simple_schema>
 
 String listOf(String t) {
@@ -51,3 +53,5 @@ String _normalize(String t) {
 }
 
 // end <library simple_schema>
+
+

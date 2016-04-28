@@ -1,11 +1,25 @@
 part of simple_schema.simple_schema;
 
 class Enum {
-  Enum(this.id, [ this.values ]);
 
-  Id id;
-  List<String> values = [];
+  Enum
+  (
+  this.id
+  ,
+  [
+  values
+  ])
+  : values = values
+   ?? []
+
+  ;
+
+  Id id
+  ;
+  List<String> values
+   = [];
   List<Id> get valueIds => _valueIds;
+
   // custom <class Enum>
 
   String get name => id.camel;
@@ -19,23 +33,38 @@ Enum($id) => [\n\t${zip([_valueIds, values]).map((l) => '${l[0]} -> ${l[1]}').jo
   }
 
   // end <class Enum>
-  List<Id> _valueIds;
+
+  List<Id> _valueIds
+  ;
+
 }
+
 
 /// Property entry in a schema
 class Property {
-  Property(this.id);
+
+  Property
+  (
+  this.id
+  )
+  ;
 
   /// Id for property used to generate the name
-  Id id;
+  Id id
+  ;
   /// Documentation for the property
-  String doc;
+  String doc
+  ;
   /// Initial value, as perk type will be gleaned if provided
-  dynamic init;
+  dynamic init
+  ;
   SimpleSchema get schema => _schema;
-  bool isRequired;
+  bool isRequired
+  ;
   /// What type should be stored in the property
-  var type;
+  var type
+  ;
+
   // custom <class Property>
 
   void _finalize(SimpleSchema schema) {
@@ -45,23 +74,37 @@ class Property {
   String get name => id.camel;
 
   // end <class Property>
-  SimpleSchema _schema;
+
+  SimpleSchema _schema
+  ;
+
 }
+
 
 /// A schema created from a simple, restricted set of rules defined by the
 /// members of this class for easy declarative construction.
-///
 class SimpleSchema {
-  SimpleSchema([ this.id ]);
+
+  SimpleSchema
+  (
+  [
+  this.id
+  ])
+  ;
 
   /// Id for property used to generate the name
-  Id id;
+  Id id
+  ;
   /// Documentation for the property
-  String doc;
+  String doc
+  ;
   /// List of properties for this schema
-  List<Property> properties = [];
-  List<String> union = [];
+  List<Property> properties
+   = [];
+  List<String> union
+   = [];
   Package get package => _package;
+
   // custom <class SimpleSchema>
 
   get name => id.camel;
@@ -134,24 +177,38 @@ class SimpleSchema {
   }
 
   // end <class SimpleSchema>
-  Package _package;
+
+  Package _package
+  ;
+
 }
 
+
 /// A collection of packages
-///
 class Package {
-  Package(this.id);
+
+  Package
+  (
+  this.id
+  )
+  ;
 
   /// Id for property used to generate the name
-  Id id;
-  List<Package> imports = [];
+  Id id
+  ;
+  List<Package> imports
+   = [];
   /// Set up all schema in package to be required by default
-  bool defaultRequired = true;
+  bool defaultRequired
+   = true;
   /// List of types (analagous to #/definitions/...
-  List<SimpleSchema> types = [];
-  List<Enum> enums = [];
+  List<SimpleSchema> types
+   = [];
+  List<Enum> enums
+   = [];
   /// Map of defined types
   Map<String,SimpleSchema> get typeMap => _typeMap;
+
   // custom <class Package>
 
   Map _schema(String id) => _schemaMap['definitions'][id];
@@ -252,9 +309,14 @@ class Package {
   }
 
   // end <class Package>
-  Map<String,SimpleSchema> _typeMap = {};
-  Map _schemaMap;
+
+  Map<String,SimpleSchema> _typeMap
+   = {};
+  Map _schemaMap
+  ;
+
 }
+
 // custom <part simple_schema>
 
 Enum ssEnum(String id, [ List<String> values ]) {
@@ -277,3 +339,4 @@ SimpleSchema union(String id, List<String> oneOf) =>
   ..union = oneOf;
 
 // end <part simple_schema>
+
