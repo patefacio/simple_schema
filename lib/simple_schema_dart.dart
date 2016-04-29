@@ -49,7 +49,7 @@ Library makeLibraryFromSimpleSchema(Package package,
     }) {
   _logger.info("Making library for ${package.id}");
   var lib = library('${package.id.snake}')
-    ..includeLogger = true;
+    ..includesLogger = true;
   package.types.forEach((t) {
 
     var schemaClassId = t.id.camel;
@@ -72,17 +72,18 @@ Library makeLibraryFromSimpleSchema(Package package,
       ((immutablesSet == null)? false :
           immutablesSet.contains(schemaClassId));
 
+    bool hasDefaultCtor = defaultCtor && !immutable;
     var klass = class_(classId)
       ..doc = t.doc
-      ..opEquals = true
-      ..copyable = true
-      ..jsonSupport = true
-      ..ctorSansNew = !immutable
-      ..defaultCtor = defaultCtor && !immutable
-      ..courtesyCtor = immutable
-      ..builder = immutable
+      ..hasOpEquals = true
+      ..isCopyable = true
+      ..hasJsonSupport = true
+      ..hasCtorSansNew = !immutable
+      ..hasDefaultCtor = hasDefaultCtor
+      //      ..hasCourtesyCtor = !hasDefaultCtor && immutable
+      ..hasBuilder = immutable
       ..allMembersFinal = immutable
-      ..jsonToString = true;
+      ..hasJsonToString = true;
 
     t.properties.forEach((prop) {
 
@@ -131,12 +132,10 @@ Library makeLibraryFromSimpleSchema(Package package,
       enum_(e.id.snake)
       ..hasRandJson = true
       ..values = e.valueIds
-      ..jsonSupport = true);
+      ..hasJsonSupport = true);
   });
 
   return lib;
 }
 
 // end <library simple_schema_dart>
-
-
